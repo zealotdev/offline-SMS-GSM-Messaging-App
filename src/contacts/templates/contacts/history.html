@@ -1,0 +1,69 @@
+{% extends 'base.html' %} {% block title %}Category{% endblock %}
+<!-- Side nav -->
+{% block content %}
+<div class="ui grid flex-1">
+  <div class="three wide column">
+    <div class="ui vertical fluid tabular menu">
+      <a class="item" href="{% url 'index' %}">
+        Dashboard
+      </a>
+      <a class="item" href="{% url 'category' %}">
+        Categories
+      </a>
+      <a class="item" href="{% url 'add_contact' %}">
+        New Contact
+      </a>
+      <a class="item active" href="{% url 'history' %}">
+        Message History
+      </a>
+      <a class="item">
+        Admin
+      </a>
+    </div>
+  </div>
+  <div class="thirteen wide stretched column">
+    <div class="border-t border-r border-l border-gray-400 p-20 mr-4">
+      <div class="h-auto">
+        <div class="text-4xl text-gray-600">Messages History</div>
+        <div class="my-4">
+          <span class="font-bold text-gray-700">Summary:</span>
+          <span class="text-gray-600 ml-10">Sent:120</span>
+          <span class="text-gray-600 ml-10">Last sent: 12,feb,2019</span>
+        </div>
+        <div>
+          <div class="text-xl text-gray-700 border-b border-gray-400">
+            List Of Messages
+          </div>
+          <div class="bg-white py-4">
+            <div class="bg-gray-100 p-4 rounded-lg">
+              <div>
+                MESSAGE:01
+              </div>
+              <span class="text-gray-700">Sent To:</span>
+              <p class="text-blue-600">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Molestiae sequi expedita sed quibusdam rerum, commodi illum
+                dolore assumenda ducimus eligendi provident praesentium quo
+                soluta, unde maxime porro enim. Obcaecati, recusandae.
+              </p>
+              <br />
+              <span class="text-gray-700">Text:</span>
+              <p class="text-blue-600">
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                Voluptate dolor et qui praesentium eligendi ullam tempore
+                dolorum explicabo autem nostrum, consequatur quia officiis magni
+                eius necessitatibus nisi est eum voluptatibus?
+              </p>
+              <br />
+              <span class="text-gray-700">Timestamp:</span>
+              <span class="text-blue-600">
+                12,feb,2019
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

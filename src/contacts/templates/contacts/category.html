@@ -1,0 +1,81 @@
+{% extends 'base.html' %} {% block title %}Category{% endblock %}
+
+<!-- Side nav -->
+{% block content%}
+<div class="ui grid flex-1">
+  <div class="three wide column">
+    <div class="ui vertical fluid tabular menu">
+      <a class="item" href="{% url 'index' %}">
+        Dashboard
+      </a>
+      <a class="item active" href="{% url 'category' %}">
+        Categories
+      </a>
+      <a class="item" href="{% url 'add_contact' %}">
+        New Contact
+      </a>
+      <a class="item" href="{% url 'history' %}">
+        Message History
+      </a>
+      <a class="item">
+        Admin
+      </a>
+    </div>
+  </div>
+
+  <div class="thirteen wide stretched column">
+    <div class="border-t border-r border-l border-gray-400 p-20 mr-4">
+      <div class="h-auto">
+        <div class="text-4xl text-gray-600">
+          Registered Categories
+        </div>
+        {% if msg %}
+        <div
+          class="p-4 bg-green-100 border-2 border-green-300 text-green-500 font-semibold my-4 rounded-lg"
+        >
+          Info: Saved Suceesful
+        </div>
+
+        {% endif %}
+        <table class="ui compact table striped celled blue">
+          <thead>
+            <tr>
+              <th>Category Name</th>
+              <th>Total Contacts</th>
+              <th>Created On</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for category in category_list %}
+            <tr>
+              <td>
+                <a
+                  href="{% url 'category-detail' category.id %}"
+                  class="text-blue-600"
+                  >{{ category.name }}</a
+                >
+              </td>
+              <td>{{ category.contact_set.count }}</td>
+              <td>{{ category.created_on }}</td>
+            </tr>
+
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <th colspan="4">
+                <a
+                  class="ui right floated small primary labeled icon button"
+                  href="{% url 'add_category' %}"
+                >
+                  <i class="edit outline icon"></i> edit | delete | add
+                </a>
+              </th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

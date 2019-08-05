@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  {% load static %}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <!-- Semantic-UI-CSS -->
+    <link
+      rel="stylesheet"
+      href="{% static 'libs/semantic-ui/semantic.min.css' %}"
+    />
+    <!-- Tailwind cimpiled theme style sheet -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <!-- Custom style-sheet -->
+    <link rel="stylesheet" href="{% static 'css/custom.style.css' %}" />
+
+    <!-- jQuery -->
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+
+    
+    <!-- Semantic-UI-JS -->
+    <script src="{% static 'libs/semantic-ui/semantic.min.js' %}"></script>
+    
+    <!-- Custom JS -->
+    <script src="{% static 'js/custom.js' %}"></script>
+
+    <title>SMS | {% block title %} {% endblock %}</title>
+  </head>
+  <body class="font-sans font-semibold flex flex-col h-full">
+    
+    <!-- Top Nav -->
+    <nav class="h-auto border-b-2 border-gray-200 shadow-sm mb-10">
+        <div class="py-2 px-8 text-center">
+          
+            <img src="{% static 'img/icon.png' %}" class="h-16 w-16 inline">
+            <span class="font-extrabold text-4xl text-blue-500"> SMS-System</span>
+      
+
+        </div>
+    </nav>
+  
+    {% block content %} 
+    {% endblock %}
+    <footer class="mt-12 pb-4 text-center p-b">
+    <span class="text-md text-gray-600">AnonCodex&copy;{% now 'Y' %}, All rights reserved</span>
+    </footer>
+  </body>
+</html>

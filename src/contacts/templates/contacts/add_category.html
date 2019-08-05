@@ -1,0 +1,62 @@
+{% extends 'base.html' %} {% block title %}Add Contact{% endblock %}
+ {% block content %}
+<!-- Side nav -->
+<div class="ui grid">
+  <div class="three wide column">
+    <div class="ui vertical fluid tabular menu">
+      <a class="item" href="{% url 'index' %}">
+        Dashboard
+      </a>
+      <a class="item" href="{% url 'category' %}">
+        Categories
+      </a>
+      <a class="item" href="{% url 'add_contact' %}">
+        New Contact
+      </a>
+      <a class="item" href="{% url 'history' %}">
+            Message History
+        </a>
+      <a class="item">
+        Admin
+      </a>
+
+    </div>
+  </div>
+  <div class="thirteen wide stretched column">
+    <div class="border-t border-r border-l border-gray-400 p-20 mr-4">
+      <div class="h-auto">
+        <div class="flex justify-center">
+          <div
+            class="flex-auto text-4xl text-gray-600 pb-6 border-b-2 border-gray-300 max-w-5xl"
+          >
+            Registere New Category
+          </div>
+        </div>
+        <div class="flex justify-center">
+          <div class="flex-auto my-5 max-w-5xl">
+            <form method="POST" class="ui form right floated">
+              {% csrf_token %}
+              {{ formset.management_form }}
+              {% for form in formset %}
+              {{ msg }}
+
+              {{ form }}
+              <div class="mt-4"></div>
+              {% endfor %}
+              <div class="mt-6">
+                <button
+                  type="submit"
+                  class="ui right floated small primary labeled icon button"
+                >
+                  <i class="plus icon"></i> save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

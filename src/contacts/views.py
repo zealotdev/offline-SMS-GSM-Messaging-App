@@ -5,7 +5,7 @@ from django_tables2 import RequestConfig
 
 
 from contacts.tables import ContactTable
-from contacts.models import Category, Contact
+from contacts.models import Category, Contact, MessageHistory
 from contacts.forms import CategoryFormSet
 
 # SMS script
@@ -16,24 +16,37 @@ class IndexView(View):
     def get(self, request):
         # Collect statistics
         # Total Contacts
-        t_contacts = Contact.objects.all().count()
 
+        if Contact.objects.all() is not None:
+            t_contacts = Contact.objects.all().count()
+
+        else:
+            t_contacts = 0
         # Total Categories
-        t_categories = Category.objects.all().count()
+        if Category.objects.all() is not None:
+            t_categories = Category.objects.all().count()
 
-        # Grab all the categories from db
-        cat_queryset = Category.objects.all()
+            # Grab all the categories from db
+            cat_queryset = Category.objects.all()
 
-        # Grab contacts list of the first category
-        first_category = Category.objects.all()[0]
-        contact_list_table = ContactTable(first_category.contact_set.all())
-        RequestConfig(request).configure(contact_list_table)
-
+        else:
+            t_categories = 0
+            cat_queryset = 0
+            # Grab contacts list of the first category
+        if Category.objects.all().count() >= 1:
+            first_category = Category.objects.all()[0]
+            contact_list_table = ContactTable(
+                first_category.contact_set.all())
+            RequestConfig(request).configure(contact_list_table)
+        else:
+            first_category = None
+            contact_list_table = None
         context = {
             'contact_list_table': contact_list_table,
             'categories': cat_queryset,
             't_categories': t_categories,
-            't_contacts': t_contacts
+            't_contacts': t_contacts,
+            'first_category': first_category
         }
         return render(request, 'contacts/index.html', context)
 
@@ -134,29 +147,42 @@ class AddContactView(View):
 
 class SendSMSView(View):
     def post(self, request):
+        # Get the active category
+        active_cat_name = request.POST['category']
+        active_cat = Category.objects.get(name=active_cat_name)
+
+        # Get Ids of selected contacts
         pks = request.POST.getlist('selection')
-        selected_contacts = Contact.objects.filter(pk__in=pks)
+        selected_contacts_name = Contact.objects.filter(pk__in=pks)
 
         # Grab the message
         message = request.POST['message']
 
         # Empty Recipients List
         recipients = ''
+        from_category = ''
+        for contact_name in selected_contacts_name:
 
-        for contact_name in selected_contacts:
-            phone_number = Contact.objects.get(name=contact_name).phone
+            phone_number = active_cat.contact_set.get(pk=contact_name.id).phone
 
             # //TODO: sendmessage script goes here
             number = str(phone_number)
             number = "0"+number
             recipients = recipients + number
-            recipients = recipients + ','
+            recipients = recipients + ', '
 
             # sender.sendsms(phone_number, message)
             # sender = Sender()
         # Remove last coma
-        recipients = recipients[:-1]
-        print(recipients)
+        recipients = recipients[:-2]
+        # print(recipients)
+
+        # FIXME: assume message has alread send
+        # Fetch category
+
+        history = MessageHistory(
+            text=message, recipients=recipients, category=active_cat_name)
+        history.save()
         # Grab all the categories from db
         cat_queryset = Category.objects.all()
 
@@ -165,13 +191,34 @@ class SendSMSView(View):
         contact_list_table = ContactTable(first_category.contact_set.all())
         RequestConfig(request).configure(contact_list_table)
 
+        # Statistics
+        t_contacts = Contact.objects.all().count()
+        t_categories = Category.objects.all().count()
+
         context = {
             'contact_list_table': contact_list_table,
-            'categories': cat_queryset
+            'categories': cat_queryset,
+            't_contacts': t_contacts,
+            't_categories': t_categories
         }
         return render(request, 'contacts/index.html', context)
 
 
 class HistoryView(View):
     def get(self, request):
-        return render(request, 'contacts/history.html')
+        # Get history
+
+        history = MessageHistory.objects.all()
+        counts = MessageHistory.objects.all().count()
+        print(history)
+        if history:
+            context = {
+                'history': history,
+                'counts': counts,
+            }
+        else:
+            context = {
+                'info': 'No history'
+
+            }
+        return render(request, 'contacts/history.html', context)

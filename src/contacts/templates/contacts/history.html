@@ -27,13 +27,22 @@
         <div class="text-4xl text-gray-600">Messages History</div>
         <div class="my-4">
           <span class="font-bold text-gray-700">Summary:</span>
-          <span class="text-gray-600 ml-10">Sent:120</span>
+          <span class="text-gray-600 ml-10">Total sent messages: {% if counts %}{{counts}}{% else %}0{% endif %}</span>
           <span class="text-gray-600 ml-10">Last sent: 12,feb,2019</span>
         </div>
         <div>
+          {% if info %}
+
+          <div class="p-4 bg-green-100 border-2 border-green-300 text-green-500 font-semibold my-4 rounded-lg">
+            {{info}}
+          </div>
+          {% endif %}
+
+          {% if history %}
           <div class="text-xl text-gray-700 border-b border-gray-400">
             List Of Messages
           </div>
+          {% for single_history in history %}
           <div class="bg-white py-4">
             <div class="bg-gray-100 p-4 rounded-lg">
               <div>
@@ -41,26 +50,28 @@
               </div>
               <span class="text-gray-700">Sent To:</span>
               <p class="text-blue-600">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Molestiae sequi expedita sed quibusdam rerum, commodi illum
-                dolore assumenda ducimus eligendi provident praesentium quo
-                soluta, unde maxime porro enim. Obcaecati, recusandae.
+                {{single_history.recipients}}
               </p>
               <br />
               <span class="text-gray-700">Text:</span>
-              <p class="text-blue-600">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                Voluptate dolor et qui praesentium eligendi ullam tempore
-                dolorum explicabo autem nostrum, consequatur quia officiis magni
-                eius necessitatibus nisi est eum voluptatibus?
+              <p class="text-blue-600 bg-white italic pb-10 rounde-lg">
+                {{single_history.text}}
               </p>
               <br />
               <span class="text-gray-700">Timestamp:</span>
               <span class="text-blue-600">
-                12,feb,2019
+                {{single_history.timestamp}}
+              </span>
+              </p>
+              <br />
+              <span class="text-gray-700">Category:</span>
+              <span class="text-blue-600">
+                {{single_history.category}}
               </span>
             </div>
           </div>
+          {% endfor %}
+          {% endif %}
         </div>
       </div>
     </div>

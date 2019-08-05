@@ -15,6 +15,6 @@ class ContactTable(tables.Table):
 
     class Meta:
         model = Contact
-        fields = ['name', 'phone', 'date_registred']
-        sequence = ('selection', 'name', 'phone', 'date_registred')
+        fields = ['name', 'phone', 'date_registered']
+        sequence = ('selection', 'name', 'phone', 'date_registered')
         template_name = 'table/table.html'

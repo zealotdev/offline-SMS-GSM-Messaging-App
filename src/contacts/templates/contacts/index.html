@@ -1,140 +1,157 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 {% load render_table from django_tables2 %}
 {% block title %}Home{% endblock %}
 
 {% block content %}
 <!-- Side nav -->
 <div class="ui grid ">
-    <div class="three wide column">
-      <div class="ui vertical fluid tabular menu">
-        <a class="item active">
-          Dashboard
-        </a>
-        <a class="item" href="{% url 'category' %}">
-          Categories
-        </a>
-        <a class="item" href="{% url 'add_contact' %}">
-          New Contact
-        </a>
-        <a class="item" href="{% url 'history' %}">
-            Message History
-          </a>
-        <a class="item">
-          Admin
-        </a>
+  <div class="three wide column">
+    <div class="ui vertical fluid tabular menu">
+      <a class="item active">
+        Dashboard
+      </a>
+      <a class="item" href="{% url 'category' %}">
+        Categories
+      </a>
+      <a class="item" href="{% url 'add_contact' %}">
+        New Contact
+      </a>
+      <a class="item" href="{% url 'history' %}">
+        Message History
+      </a>
+      <a class="item">
+        Admin
+      </a>
+    </div>
+  </div>
+
+
+  <div class="thirteen wide stretched column">
+    <div class="border-t border-r border-l border-gray-400 p-20 mr-4">
+      <div class="h-auto">
+        <!-- STATISTICS  -->
+        <div class="flex border-b-2 border-blue-100 items-center h-auto">
+          <h1 class="flex-1 text-center text-4xl font-sans text-gray-600">Statistics</h1>
+          <div class="flex-1 bg-white items-baseline">
+            <div class="flex items-baseline">
+              <div class="flex-initial bg-gray-100 p-2 rounded-full">
+                <div class="text-6xl text-blue-500">
+                  {% if t_categories %}
+                  {% if t_categories >= 99 %}
+                  <h1>{{t_categories}}</h1>
+                  {% else %}
+                  <h1>{{t_categories|stringformat:"03d"}}</h1>
+                  {% endif %}
+                  {% else %}
+                  <h1>0</h1>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="flex-initial">
+                <span class="text-2xl text-gray-600 uppercase font-semibold tracking-tighter">Registered
+                  Categories</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-baseline">
+              <div class="flex-initial bg-gray-100 p-2 rounded-full">
+                <div class="text-6xl text-blue-500">
+                  {% if t_contacts %}
+                  {% if t_contacts >= 99 %}
+                  <h1>{{t_contacts}}</h1>
+                  {% else %}
+                  <h1>{{t_contacts|stringformat:"03d"}}</h1>
+                  {% endif %}
+                  {% else %}
+                  <h1>0</h1>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="flex-initial">
+                <span class="text-2xl text-gray-600 uppercase font-semibold tracking-tighter">Total Contacts</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- STATISTICS end -->
+
+      <!-- CONTACTS list -->
+      <div class="mt-8">
+        <!-- Filter -->
+        <div class="flex justify-end items-center border-b-2 border-gray-300 pb-4">
+          <div class="flex-auto header mr-10">
+            <h1>Contacts List</h1>
+          </div>
+          <div class="flex-none mr-3">
+
+            <form class="ui form" method="POST" action="{% url 'contacts_list' %}">
+              {% csrf_token %}
+              <div class=" inline field">
+
+                <label for='filter'>Filter Contacts</label>
+                <select name="category" id="filter">
+                  {% if active_cat %}
+                  <option value="{{active_cat.id}}">{{active_cat.name}}</option>
+                  {% endif %}
+                  {% if categories %}
+                  {% for category in categories %}
+                  <option value="{{category.id}}">{{category.name}}</option>
+                  {% endfor %}
+                  {% else %}
+                  <option value="">Please register category</option>
+                  {% endif %}
+                </select>
+
+              </div>
+              <button type="submit"
+                class="bg-blue-500 text-white px-3 py-2 rounded-lg uppercase font-semibold hover:bg-blue-400">filter</button>
+            </form>
+          </div>
+        </div>
+        <!-- Filter End -->
+
+        <!-- Contacts list -->
+        <!-- <div class="overflow-auto h-64 mt-1"> -->
+        {% if contact_list_table %}
+        <form method="POST" action='{% url 'sendsms' %}'>
+          {% csrf_token %}
+          {% render_table contact_list_table %}
+          <div class="mt-16">
+            <tr>
+              <td colspan="12">
+                <div class="rounded-lg py-3">
+                  <div class="ui form">
+                    <div class="ui inline field">
+                      <label for="msg">Write the message: </label>
+                      <textarea name="message" id="msg" rows="6"></textarea>
+                      {% if active_cat %}
+                      <input type="hidden" name="category" value="{{active_cat}}">
+                      {% else %}
+                      <input type="hidden" name="category" value="{{first_category}}">
+                      {% endif %}
+                    </div>
+                    <div class="my-3">
+                      <button type="submit" class="ui right floated small primary labeled icon button">
+                        <i class="paper plane icon"></i> Send Message
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </div>
+        </form>
+        {% else %}
+        <div
+          class="p-20 bg-green-100 border-2 border-green-300 text-green-500 font-semibold rounded-lg mt-24 text-center">
+          <span class="text-3xl">Info!: Please add category with contacts</span>
+        </div>
+        {% endif %}
       </div>
     </div>
-    <div class="thirteen wide stretched column">
-      <div class="border-t border-r border-l border-gray-400 p-20 mr-4">
-        <div class="h-auto">
-          <!-- STATISTICS  -->
-          <div class="flex border-b-2 border-blue-100 items-center h-auto">
-            <h1 class="flex-1 text-center text-4xl font-sans text-gray-600">Statistics</h1>
-            <div class="flex-1 bg-white items-baseline">
-              <div class="flex items-baseline">
-                <div class="flex-initial bg-gray-100 p-2 rounded-full">
-                  <div class="text-6xl text-blue-500">
-                    {% if t_categories %}
-                      {% if t_categories >= 99 %}
-                        <h1>{{t_categories}}</h1>
-                      {% else %}
-                        <h1>{{t_categories|stringformat:"03d"}}</h1>
-                      {% endif %}
-                    {% else %}
-                    <h1>0</h1>
-                    {% endif %}
-                  </div>
-                </div>
-                <div class="flex-initial">
-                  <span class="text-2xl text-gray-600 uppercase font-semibold tracking-tighter">Registered Categories</span>
-                </div>
-              </div>
-            </div>
-            <div class="flex-1">
-              <div class="flex items-baseline">
-                <div class="flex-initial bg-gray-100 p-2 rounded-full">
-                  <div class="text-6xl text-blue-500">
-                    {% if t_contacts %}
-                      {% if t_contacts >= 99 %}
-                        <h1>{{t_contacts}}</h1>
-                      {% else %}
-                        <h1>{{t_contacts|stringformat:"03d"}}</h1>
-                      {% endif %}
-                    {% else %}
-                    <h1>0</h1>
-                    {% endif %}
-                  </div>
-                </div>
-                <div class="flex-initial">
-                  <span class="text-2xl text-gray-600 uppercase font-semibold tracking-tighter">Total Contacts</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- STATISTICS end -->
-
-        <!-- CONTACTS list -->
-        <div class="mt-8">
-          <!-- Filter -->
-          <div class="flex justify-end items-center border-b-2 border-gray-300 pb-4">
-            <div class="flex-auto header mr-10">
-              <h1>Contacts List</h1>
-            </div>
-            <div class="flex-none mr-3">
-  
-                  <form class="ui form" method="POST" action="{% url 'contacts_list' %}">
-                      {% csrf_token %}
-                      <div class=" inline field">
-                       
-                        <label for='filter'>Filter Contacts</label>
-                        <select name="category" id="filter">
-                          {% if active_cat %}
-                          <option value="{{category.id}}">{{active_cat.name}}</option>
-                          {% endif %}
-                          {% for category in categories %}
-                          <option value="{{category.id}}">{{category.name}}</option>
-                          {% endfor %}
-                        </select>
-                        
-                      </div>
-                      <button type="submit" class="bg-blue-500 text-white px-3 py-2 rounded-lg uppercase font-semibold hover:bg-blue-400">filter</button>
-                    </form>
-            </div>
-          </div>
-          <!-- Filter End -->
-
-          <!-- Contacts list -->
-          <!-- <div class="overflow-auto h-64 mt-1"> -->
-              {% if contact_list_table %}
-              <form method="POST" action='{% url 'sendsms' %}'>
-                {% csrf_token %}
-                  {% render_table contact_list_table %}
-                  <div class="mt-16">
-                        <tr>
-                          <td colspan="12">
-                            <div class="rounded-lg py-3">
-                              <div class="ui form">
-                                <div class="ui inline field">
-                                  <label for="msg">Write the message: </label>
-                                  <textarea name="message" id="msg" rows="6"></textarea>
-                                </div>
-                               <div class="my-3">
-                                  <button type="submit" class="ui right floated small primary labeled icon button">
-                                      <i class="paper plane icon"></i> Send Message
-                                    </button>
-                               </div>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                  </div>
-              </form>
-              {% endif %}
-          </div>
-        </div>
-      </div>
-    </div> 
   </div>
-  {% endblock %}
-
+</div>
+</div>
+{% endblock %}

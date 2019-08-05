@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db import models
 from django import forms
 
-from contacts.models import Category, Contact
+from contacts.models import Category, Contact, MessageHistory
 
 
 class InineContact(admin.TabularInline):
@@ -28,3 +28,4 @@ class CategoryAdmin(admin.ModelAdmin):
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Contact)
+admin.site.register(MessageHistory)

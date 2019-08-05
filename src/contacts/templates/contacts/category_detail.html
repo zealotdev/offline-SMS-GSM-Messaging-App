@@ -29,8 +29,7 @@
           <div class="text-xl text-gray-600">
             Total number of contacts :
             <span class="text-4xl font-bold text-blue-400">
-              {{ category.contact_set.count }}</span
-            >
+              {{ category.contact_set.count }}</span>
           </div>
           <div class="text-gray-700 mt-4">
             List of contacts:
@@ -46,14 +45,10 @@
                 {% for contact in category.contact_set.all %}
                 <tr>
                   <td>
-                    <a
-                      href="{% url 'category-detail' category.id %}"
-                      class="text-blue-600"
-                      >{{ contact.name }}</a
-                    >
+                    <a href="{% url 'category-detail' category.id %}" class="text-blue-600">{{ contact.name }}</a>
                   </td>
                   <td>0{{ contact.phone }}</td>
-                  <td>{{ contact.date_registred }}</td>
+                  <td>{{ contact.date_registered }}</td>
                 </tr>
 
                 {% endfor %}
@@ -61,10 +56,7 @@
               <tfoot>
                 <tr>
                   <th colspan="4">
-                    <a
-                      class="ui right floated small primary labeled icon button"
-                      href="{% url 'add_contact' %}"
-                    >
+                    <a class="ui right floated small primary labeled icon button" href="{% url 'add_contact' %}">
                       <i class="plus icon"></i> add contact
                     </a>
                   </th>

@@ -10,8 +10,9 @@ class Category(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = 'Category Detail'
-        verbose_name_plural = 'Categories Detail'
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
+        ordering = ['-created_on']
 
 
 class Contact(models.Model):
@@ -20,14 +21,15 @@ class Contact(models.Model):
                                    RegexValidator(r'^\d{9,10}$')])
     category = models.ForeignKey(
         Category, verbose_name='Belongs to Category', on_delete=models.CASCADE)
-    date_registred = models.DateTimeField(auto_now_add=True)
+    date_registered = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
-        verbose_name = 'Contact Detail'
-        verbose_name_plural = 'Contacts Detail'
+        verbose_name = 'Contact'
+        verbose_name_plural = 'Contacts'
+        ordering = ['-date_registered']
 
 
 class MessageHistory(models.Model):
@@ -35,6 +37,9 @@ class MessageHistory(models.Model):
     category = models.CharField(max_length=100)
     recipients = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-timestamp']
 
     def __str__(self):
         return self.text[:100]

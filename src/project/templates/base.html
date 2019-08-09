@@ -21,8 +21,8 @@
   <!-- Semantic-UI-JS -->
   <script src="{% static 'libs/semantic-ui/semantic.min.js' %}"></script>
 
-  <!-- Custom JS -->
-  <script src="{% static 'js/custom.js' %}"></script>
+  <!-- Scripts -->
+  {% block scripts %}{% endblock %}
 
   <title>SMS | {% block title %} {% endblock %}</title>
 </head>
@@ -45,6 +45,9 @@
   <footer class="mt-12 pb-4 text-center p-b">
     <span class="text-md text-gray-600">&copy;{% now 'Y' %}, All rights reserved</span>
   </footer>
+  <!-- Custom JS -->
+  <script src="{% static 'js/custom.js' %}"></script>
+
 </body>
 
 </html>

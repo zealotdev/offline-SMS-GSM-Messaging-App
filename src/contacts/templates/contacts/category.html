@@ -17,7 +17,7 @@
       <a class="item" href="{% url 'history' %}">
         Message History
       </a>
-      <a class="item">
+      <a class="item" href="http://127.0.0.1:8000/admin/">
         Admin
       </a>
     </div>
@@ -30,10 +30,15 @@
           Registered Categories
         </div>
         {% if msg %}
-        <div
-          class="p-4 bg-green-100 border-2 border-green-300 text-green-500 font-semibold my-4 rounded-lg"
-        >
-          Info: Saved Suceesful
+        <div role="alert" class="my-8">
+          <div class="bg-green-500 text-white font-bold rounded-t px-4 py-2">
+            Success!
+          </div>
+          <div
+            class="border border-t-0 border-green-400 rounded-b bg-green-100 px-4 py-3 text-green-700"
+          >
+            <p>Changes saved successful.</p>
+          </div>
         </div>
 
         {% endif %}

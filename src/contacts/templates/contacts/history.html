@@ -16,7 +16,7 @@
       <a class="item active" href="{% url 'history' %}">
         Message History
       </a>
-      <a class="item">
+      <a class="item" href="http://127.0.0.1:8000/admin/">
         Admin
       </a>
     </div>
@@ -44,33 +44,49 @@
           </div>
           {% for single_history in history %}
           <div class="bg-white py-4">
-            <div class="bg-gray-100 p-4 rounded-lg">
-              <div>
-                MESSAGE:01
-              </div>
-              <span class="text-gray-700">Sent To:</span>
-              <p class="text-blue-600">
-                {{single_history.recipients}}
-              </p>
-              <br />
-              <span class="text-gray-700">Text:</span>
-              <p class="text-blue-600 bg-white italic pb-10 rounde-lg">
-                {{single_history.text}}
-              </p>
-              <br />
-              <span class="text-gray-700">Timestamp:</span>
-              <span class="text-blue-600">
-                {{single_history.timestamp}}
-              </span>
-              </p>
-              <br />
-              <span class="text-gray-700">Category:</span>
-              <span class="text-blue-600">
-                {{single_history.category}}
-              </span>
-            </div>
+              <div role="alert">
+                  <div class="bg-blue-500 text-white font-bold rounded-t px-4 py-2">
+                    <span class="font-bold">Send To: </span><span>{{single_history.recipients}}</span>
+                  </div>
+                  <div class="border border-t-0 border-blue-400 rounded-b bg-blue-100 px-4 py-3 text-blue-700">
+                      <span class="text-gray-700">Message:</span>
+                      <div class="select-all">
+                      <p class="text-blue-600 ">
+                        {{single_history.text | linebreaks}}
+                      </p>
+                    </div>
+                      <br />
+                      <span class="text-gray-700">Time:</span>
+                      <span class="text-blue-600">
+                        <i>{{single_history.timestamp}}</i>
+                      </span>
+                      <span class="text-gray-700">Category:</span>
+                      <span class="text-blue-600">
+                        {{single_history.category}}
+                      </span>
+                  </div>
+                </div>
           </div>
           {% endfor %}
+          <div class="ui pagination menu right floated">
+                    
+              {% if is_paginated %}
+               {% if page_obj.has_previous %}
+                 <a href="?page=1" class="item"><i class="angle double left icon"></i> first</a>
+                  <a href="?page={{ page_obj.previous_page_number }}" class="item"><i class="angle left icon"></i> previous</a>
+               {% endif %}
+     
+               <span class="item">
+                   Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+               </span>
+     
+               {% if page_obj.has_next %}
+                   <a href="?page={{ page_obj.next_page_number }}" class="item">next<i class="angle right icon"></i></a>
+                   <a href="?page={{ page_obj.paginator.num_pages }}" class="item">last <i class="angle double right icon"></i></a>
+               {% endif %}
+          {% endif %}
+       
+         </div>
           {% endif %}
         </div>
       </div>

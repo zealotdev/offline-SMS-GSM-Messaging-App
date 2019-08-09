@@ -22,6 +22,7 @@ class IndexView(View):
 
         else:
             t_contacts = 0
+
         # Total Categories
         if Category.objects.all() is not None:
             t_categories = Category.objects.all().count()
@@ -38,15 +39,25 @@ class IndexView(View):
             contact_list_table = ContactTable(
                 first_category.contact_set.all())
             RequestConfig(request).configure(contact_list_table)
+
+            # Check if there are contacts associated with the category
+            if first_category.contact_set.all().count() >= 1:
+                has_contacts = True
+            else:
+                has_contacts = False
+
         else:
             first_category = None
             contact_list_table = None
+            has_contacts = None
         context = {
             'contact_list_table': contact_list_table,
             'categories': cat_queryset,
             't_categories': t_categories,
             't_contacts': t_contacts,
-            'first_category': first_category
+            'first_category': first_category,
+            'has_contacts': has_contacts
+
         }
         return render(request, 'contacts/index.html', context)
 
@@ -68,11 +79,34 @@ class ContactListView(View):
         # Get selected category name
         active_cat = Category.objects.get(pk=selected_cat)
 
+        # Check if there are contacts associated with the category
+        if active_cat.contact_set.all().count() >= 1:
+            has_contacts = True
+        else:
+            has_contacts = False
+
+        # Collect statistics
+        if Contact.objects.all() is not None:
+            t_contacts = Contact.objects.all().count()
+
+        else:
+            t_contacts = 0
+
+        # Total Categories
+        if Category.objects.all() is not None:
+            t_categories = Category.objects.all().count()
+
+        else:
+            t_categories = 0
+
         # Create a context dictionary
         context = {
             'contact_list_table': contact_list_table,
             'categories': cat_queryset,
-            'active_cat': active_cat
+            'active_cat': active_cat,
+            't_contacts': t_contacts,
+            't_categories': t_categories,
+            'has_contacts': has_contacts
         }
         return render(request, 'contacts/index.html', context)
 
@@ -147,78 +181,124 @@ class AddContactView(View):
 
 class SendSMSView(View):
     def post(self, request):
-        # Get the active category
-        active_cat_name = request.POST['category']
-        active_cat = Category.objects.get(name=active_cat_name)
 
-        # Get Ids of selected contacts
-        pks = request.POST.getlist('selection')
-        selected_contacts_name = Contact.objects.filter(pk__in=pks)
+        if request.POST.get('selectall', False) or request.POST.getlist('selection'):
+            # Get the active category
+            active_cat_name = request.POST['category']
+            active_cat = Category.objects.get(name=active_cat_name)
+            if request.POST.get('selectall', False):
+                category = Category.objects.get(name=active_cat)
+                selected_contacts_name = category.contact_set.all()
+                print(selected_contacts_name)
 
-        # Grab the message
-        message = request.POST['message']
+            elif request.POST.getlist('selection'):
+                # Get Ids of selected contacts
+                pks = request.POST.getlist('selection')
+                selected_contacts_name = Contact.objects.filter(pk__in=pks)
 
-        # Empty Recipients List
-        recipients = ''
-        from_category = ''
-        for contact_name in selected_contacts_name:
+            # Grab the message
+            message = request.POST['message']
 
-            phone_number = active_cat.contact_set.get(pk=contact_name.id).phone
+            # Empty Recipients List
+            recipients = ''
+            from_category = ''
+            for contact_name in selected_contacts_name:
 
-            # //TODO: sendmessage script goes here
-            number = str(phone_number)
-            number = "0"+number
-            recipients = recipients + number
-            recipients = recipients + ', '
+                phone_number = active_cat.contact_set.get(
+                    pk=contact_name.id).phone
 
-            # sender.sendsms(phone_number, message)
-            # sender = Sender()
-        # Remove last coma
-        recipients = recipients[:-2]
-        # print(recipients)
+                # //TODO: sendmessage script goes here
+                number = str(phone_number)
+                number = "0"+number
+                recipients = recipients + number
+                recipients = recipients + ', '
 
-        # FIXME: assume message has alread send
-        # Fetch category
+                # sender.sendsms(phone_number, message)
+                # sender = Sender()
+                # Remove last coma
+            recipients = recipients[:-2]
+            # print(recipients)
 
-        history = MessageHistory(
-            text=message, recipients=recipients, category=active_cat_name)
-        history.save()
-        # Grab all the categories from db
-        cat_queryset = Category.objects.all()
+            # FIXME: assume message has alread send
+            # Fetch category
 
-        # Grab contacts list of the first category
-        first_category = Category.objects.all()[0]
-        contact_list_table = ContactTable(first_category.contact_set.all())
-        RequestConfig(request).configure(contact_list_table)
+            history = MessageHistory(
+                text=message, recipients=recipients, category=active_cat_name)
+            history.save()
+            # Grab all the categories from db
+            cat_queryset = Category.objects.all()
 
-        # Statistics
-        t_contacts = Contact.objects.all().count()
-        t_categories = Category.objects.all().count()
+            # Grab contacts list of the first category
+            first_category = Category.objects.all()[0]
+            contact_list_table = ContactTable(
+                first_category.contact_set.all())
+            RequestConfig(request).configure(contact_list_table)
 
-        context = {
-            'contact_list_table': contact_list_table,
-            'categories': cat_queryset,
-            't_contacts': t_contacts,
-            't_categories': t_categories
-        }
-        return render(request, 'contacts/index.html', context)
+            # Statistics
+            t_contacts = Contact.objects.all().count()
+            t_categories = Category.objects.all().count()
 
-
-class HistoryView(View):
-    def get(self, request):
-        # Get history
-
-        history = MessageHistory.objects.all()
-        counts = MessageHistory.objects.all().count()
-        print(history)
-        if history:
+            success = "Message was sent successful!"
             context = {
-                'history': history,
-                'counts': counts,
+                'first_category': first_category,
+                'contact_list_table': contact_list_table,
+                'categories': cat_queryset,
+                't_contacts': t_contacts,
+                't_categories': t_categories,
+                'has_contacts': True,
+                'success': success
             }
+            return render(request, 'contacts/index.html', context)
         else:
-            context = {
-                'info': 'No history'
+            error = "Please select at least one recipient!"
 
+            # Collect statistics
+            if Contact.objects.all() is not None:
+                t_contacts = Contact.objects.all().count()
+
+            else:
+                t_contacts = 0
+
+            # Total Categories
+            if Category.objects.all() is not None:
+                t_categories = Category.objects.all().count()
+
+            else:
+                t_categories = 0
+
+            # Contacts list table
+            # Grab contacts list of the first category
+            first_category = Category.objects.all()[0]
+            contact_list_table = ContactTable(
+                first_category.contact_set.all())
+            RequestConfig(request).configure(contact_list_table)
+
+            # Categories
+            # Grab all the categories from db
+            cat_queryset = Category.objects.all()
+
+            context = {
+                'first_category': first_category,
+                'categories': cat_queryset,
+                'contact_list_table': contact_list_table,
+                'error': error,
+                't_contacts': t_contacts,
+                't_categories': t_categories,
+                'has_contacts': True,
             }
-        return render(request, 'contacts/history.html', context)
+            return render(request, 'contacts/index.html', context)
+
+
+class HistoryView(ListView):
+
+    model = MessageHistory
+    context_object_name = 'history'
+    template_name = 'contacts/history.html'
+    paginate_by=5
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['counts'] = MessageHistory.objects.all().count()
+
+        return context

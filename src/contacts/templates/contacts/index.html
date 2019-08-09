@@ -1,7 +1,22 @@
 {% extends 'base.html' %}
 {% load render_table from django_tables2 %}
 {% block title %}Home{% endblock %}
+{% block scripts %}
+<script>
+  function countChar(val) {
+    var len = val.value.length;
+    if (len >= 160) {
+      val.value = val.value.substring(0, 160);
 
+    } else {
+      $("#charNum").text(160 - len);
+    }
+  }
+
+
+</script>
+
+{% endblock %}
 {% block content %}
 <!-- Side nav -->
 <div class="ui grid ">
@@ -19,7 +34,7 @@
       <a class="item" href="{% url 'history' %}">
         Message History
       </a>
-      <a class="item">
+      <a class="item" href="http://127.0.0.1:8000/admin/">
         Admin
       </a>
     </div>
@@ -30,6 +45,26 @@
     <div class="border-t border-r border-l border-gray-400 p-20 mr-4">
       <div class="h-auto">
         <!-- STATISTICS  -->
+        {% if error %}
+        <div role="alert" class="mb-8">
+            <div class="bg-red-500 text-white font-bold rounded-t px-4 py-2">
+              Error!
+            </div>
+            <div class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700">
+              <p>{{error}}.</p>
+            </div>
+          </div>
+        {% endif %}
+        {% if success %}
+        <div role="alert" class="mb-8">
+            <div class="bg-green-500 text-white font-bold rounded-t px-4 py-2">
+              Success!
+            </div>
+            <div class="border border-t-0 border-green-400 rounded-b bg-green-100 px-4 py-3 text-green-700">
+              <p>{{success}}.</p>
+            </div>
+          </div>
+        {% endif %}
         <div class="flex border-b-2 border-blue-100 items-center h-auto">
           <h1 class="flex-1 text-center text-4xl font-sans text-gray-600">Statistics</h1>
           <div class="flex-1 bg-white items-baseline">
@@ -95,7 +130,7 @@
                   {% if active_cat %}
                   <option value="{{active_cat.id}}">{{active_cat.name}}</option>
                   {% endif %}
-                  {% if categories %}
+                  {% if categories or active_cat %}
                   {% for category in categories %}
                   <option value="{{category.id}}">{{category.name}}</option>
                   {% endfor %}
@@ -105,8 +140,15 @@
                 </select>
 
               </div>
+              {% if t_categories == 0 %}
+              <button type="button"
+                class="bg-blue-500 text-white px-3 py-2 rounded uppercase font-semibold hover:bg-blue-400 cursor-not-allowed opacity-50">filter
+              </button>
+              {% else %}
               <button type="submit"
-                class="bg-blue-500 text-white px-3 py-2 rounded-lg uppercase font-semibold hover:bg-blue-400">filter</button>
+                class="bg-blue-500 text-white px-3 py-2 rounded uppercase font-semibold hover:bg-blue-400">filter
+              </button>
+              {% endif %}
             </form>
           </div>
         </div>
@@ -114,18 +156,27 @@
 
         <!-- Contacts list -->
         <!-- <div class="overflow-auto h-64 mt-1"> -->
+       
         {% if contact_list_table %}
+        {% if has_contacts %}
         <form method="POST" action='{% url 'sendsms' %}'>
           {% csrf_token %}
           {% render_table contact_list_table %}
+          <div class="pl-3">
+            <input type="checkbox" name="selectall" id="selectallid">
+            <label for="selectallid" class="text-gray-800">To All</label>
+
+          </div>
           <div class="mt-16">
             <tr>
               <td colspan="12">
                 <div class="rounded-lg py-3">
                   <div class="ui form">
                     <div class="ui inline field">
-                      <label for="msg">Write the message: </label>
-                      <textarea name="message" id="msg" rows="6"></textarea>
+                     
+                      <label for="msg">Write the message(<span id="charNum">160</span>) : </label>
+                      <textarea name="message" id="msg" rows="6" onkeyup="countChar(this)" maxlength="160" required
+                        style="white-space: pre-wrap"></textarea>
                       {% if active_cat %}
                       <input type="hidden" name="category" value="{{active_cat}}">
                       {% else %}
@@ -144,11 +195,29 @@
           </div>
         </form>
         {% else %}
-        <div
-          class="p-20 bg-green-100 border-2 border-green-300 text-green-500 font-semibold rounded-lg mt-24 text-center">
-          <span class="text-3xl">Info!: Please add category with contacts</span>
-        </div>
+        
+        <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md mb-56" role="alert">
+            <div class="flex">
+              <div class="py-1"><svg class="fill-current h-6 w-6 text-teal-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
+              <div>
+                <p class="font-bold">Attention!</p>
+                <p class="text-sm">{% if active_cat %}{{active_cat}} has no registered contacts. {% else %} Please register contacts to this category.{% endif %}</p>
+              </div>
+            </div>
+          </div>
         {% endif %}
+        {% else %}
+        <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md mb-56" role="alert">
+            <div class="flex">
+              <div class="py-1"><svg class="fill-current h-6 w-6 text-teal-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
+              <div>
+                <p class="font-bold">Attention!</p>
+                <p class="text-sm">Please add category first.</p>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+       
       </div>
     </div>
   </div>
